@@ -22,3 +22,5 @@
 ---
 
 ## Database Design
+
+![Database Design](./database-design.png)
