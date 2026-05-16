@@ -3,6 +3,9 @@
 ---
 
 ## Architecture
+### HL Architecture
+
+![HL Architecture](./higher-level-architecture.png)
 
 ### System Architecture
 
