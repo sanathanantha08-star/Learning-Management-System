@@ -1,5 +1,10 @@
 from passlib.context import CryptContext
 from src.core.logger import get_logger
+from src.core.security import (
+    hash_password,
+    verify_password,
+)
+
 from src.users.repository import UserRepository
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.users.schemas import RegisterRequest
@@ -13,12 +18,6 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 class UserService():
     def __init__(self)->None:
         self.repo=UserRepository()
-        
-    def _hash_password(self, plain: str) -> str:
-        return pwd_context.hash(plain)
-
-    def _verify_password(self, plain: str, hashed: str) -> bool:
-        return pwd_context.verify(plain, hashed)
 
 
     async def register(self,db:AsyncSession,data:RegisterRequest)->User:
@@ -31,7 +30,7 @@ class UserService():
             )
         user=User(
             email=data.email,
-            hashed_password=self._hash_password(data.password),
+            hashed_password=hash_password(data.password),
             full_name=data.ful_name,
             role=data.role
 
