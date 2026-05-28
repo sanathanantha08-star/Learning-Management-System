@@ -5,7 +5,7 @@ from sqlalchemy.exc import OperationalError, TimeoutError
 from tenacity import retry, retry_if_exception_type, stop_after_attempt
 
 from src.core.logger import get_logger
-from src.core.retry.strategies import exponential_jitter
+from src.core.retry.stratergies import exponential_jitter
 
 logger = get_logger(__name__)
 

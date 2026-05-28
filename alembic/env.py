@@ -6,8 +6,7 @@ from sqlalchemy.ext.asyncio import create_async_engine
 
 from src.config import get_settings
 from src.database import Base
-from src.users.models import User          # noqa: F401
-from src.auth.models import RefreshToken   # noqa: F401
+from src.users.models import User, RefreshToken  # noqa: F401
 
 config = context.config
 settings = get_settings()

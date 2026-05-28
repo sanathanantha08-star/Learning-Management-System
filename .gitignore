@@ -18,7 +18,6 @@ lib/
 lib64/
 
 # Virtual environments
-.env
 .venv
 env/
 venv/

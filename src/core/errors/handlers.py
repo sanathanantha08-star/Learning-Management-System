@@ -10,10 +10,17 @@ from src.core.logger import get_logger
 logger = get_logger(__name__)
 
 
-def _error_response(status_code: int, error_code: ErrorCode | str, detail: str) -> JSONResponse:
+def _error_response(
+    status_code: int,
+    error_code: ErrorCode | str,
+    detail: str,
+) -> JSONResponse:
     return JSONResponse(
         status_code=status_code,
-        content={"error_code": str(error_code), "detail": detail},
+        content={
+            "error_code": error_code.value if isinstance(error_code, ErrorCode) else error_code,
+            "detail": detail,
+        },
     )
 
 

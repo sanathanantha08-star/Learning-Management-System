@@ -14,3 +14,5 @@ class ErrorCode(str, Enum):
     USR_NOT_FOUND              = "USR_001"
     USR_INACTIVE               = "USR_002"
     USR_INVALID_PASSWORD       = "USR_003"
+    INTERNAL_ERROR             = "GEN_001"
+    VALIDATION_ERROR           = "GEN_002"

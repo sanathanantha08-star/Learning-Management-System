@@ -44,6 +44,14 @@ class TokenResponse(BaseModel):
     token_type: str = "bearer"
 
 
+# ── Logout  ─────────────────────────────────────────────────────────────────────
+class LogoutRequest(BaseModel):
+    refresh_token: str
+
+class LogoutResponse(BaseModel):
+    message: str
+
+
 # ── User out ──────────────────────────────────────────────────────────────────
 
 class UserOut(BaseModel):
@@ -55,3 +63,12 @@ class UserOut(BaseModel):
     created_at: datetime
 
     model_config = {"from_attributes": True}
+
+    # ── Refresh Tokens ──────────────────────────────────────────────────────────────────
+class RefreshTokenOutRequest(BaseModel):
+        refresh_token: str
+
+class RefreshTokenResponse(BaseModel):
+        access_token: str
+        token_type: str = "bearer"
+        

@@ -4,7 +4,7 @@ from src.core.errors.handlers import register_exception_handlers
 from src.core.logger import RequestLoggingMiddleware, setup_logging
 from src.users.router import router as users_router
 
-settings=get_settings
+settings=get_settings()
 
 def create_app()-> FastAPI:
     app = FastAPI(
