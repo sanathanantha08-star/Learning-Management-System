@@ -9,6 +9,8 @@ class ErrorCode(str, Enum):
     AUTH_REFRESH_TOKEN_INVALID = "AUTH_004"
     AUTH_INSUFFICIENT_ROLE     = "AUTH_005"
     AUTH_EMAIL_ALREADY_EXISTS  = "AUTH_006"
+    CRS_NOT_FOUND              = "CRS_001"
+    CRS_NOT_OWNER              = "CRS_002"
 
     # Users
     USR_NOT_FOUND              = "USR_001"

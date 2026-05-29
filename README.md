@@ -102,58 +102,58 @@ Authorization: Bearer <access_token>
 
 ### Users Module
 
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| POST | `/users/register` | ❌ | Register a new user (student or teacher) |
-| POST | `/users/login` | ❌ | Login and receive access + refresh tokens |
-| POST | `/users/logout` | ❌ | Revoke refresh token |
-| POST | `/users/refresh` | ❌ | Get new access token using refresh token |
-| GET | `/users/me` | ✅ | Get current user profile |
-| PUT | `/users/me` | ✅ | Update profile (name, avatar) |
-| PUT | `/users/me/password` | ✅ | Change password |
+| Method | Endpoint | Auth | Description | Status |
+|--------|----------|------|-------------|--------|
+| POST | `/users/register` | No | Register a new user (student or teacher) | Done |
+| POST | `/users/login` | No | Login and receive access + refresh tokens | Done |
+| POST | `/users/logout` | No | Revoke refresh token | Done |
+| POST | `/users/refresh` | No | Get new access token using refresh token | Done |
+| GET | `/users/me` | Yes | Get current user profile | Done |
+| PUT | `/users/me` | Yes | Update profile (name, avatar) | Done |
+| PUT | `/users/me/password` | Yes | Change password | Pending |
 
-### Courses Module _(coming soon)_
+### Courses Module
 
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| GET | `/courses` | ❌ | List and search published courses |
-| GET | `/courses/{id}` | ❌ | Get course detail with sections |
-| POST | `/courses` | ✅ Teacher | Create a new course |
-| PUT | `/courses/{id}` | ✅ Teacher | Update course (including publish) |
-| DELETE | `/courses/{id}` | ✅ Teacher | Delete course |
-| GET | `/courses/me` | ✅ Teacher | Get teacher's own courses |
+| Method | Endpoint | Auth | Description | Status |
+|--------|----------|------|-------------|--------|
+| GET | `/courses` | No | List and search published courses | Pending |
+| GET | `/courses/{id}` | No | Get course detail with sections | Pending |
+| POST | `/courses` | Teacher | Create a new course | Done |
+| PUT | `/courses/{id}` | Teacher | Update course (including publish) | Done |
+| DELETE | `/courses/{id}` | Teacher | Delete course | Pending |
+| GET | `/courses/me` | Teacher | Get teacher's own courses | Done |
 
-### Sections Module _(coming soon)_
+### Sections Module
 
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| POST | `/courses/{id}/sections` | ✅ Teacher | Add section to course |
-| PUT | `/courses/{id}/sections/{sid}` | ✅ Teacher | Update section |
-| DELETE | `/courses/{id}/sections/{sid}` | ✅ Teacher | Delete section |
+| Method | Endpoint | Auth | Description | Status |
+|--------|----------|------|-------------|--------|
+| POST | `/courses/{id}/sections` | Teacher | Add section to course | Pending |
+| PUT | `/courses/{id}/sections/{sid}` | Teacher | Update section | Pending |
+| DELETE | `/courses/{id}/sections/{sid}` | Teacher | Delete section | Pending |
 
-### Videos Module _(coming soon)_
+### Videos Module
 
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| POST | `/courses/{id}/sections/{sid}/videos` | ✅ Teacher | Add video to section |
-| GET | `/courses/{id}/sections/{sid}/videos/{vid}` | ✅ Student | Get video (enrolled only) |
-| PUT | `/courses/{id}/sections/{sid}/videos/{vid}` | ✅ Teacher | Update video |
-| DELETE | `/courses/{id}/sections/{sid}/videos/{vid}` | ✅ Teacher | Delete video |
+| Method | Endpoint | Auth | Description | Status |
+|--------|----------|------|-------------|--------|
+| POST | `/courses/{id}/sections/{sid}/videos` | Teacher | Add video to section | Pending |
+| GET | `/courses/{id}/sections/{sid}/videos/{vid}` | Student | Get video (enrolled only) | Pending |
+| PUT | `/courses/{id}/sections/{sid}/videos/{vid}` | Teacher | Update video | Pending |
+| DELETE | `/courses/{id}/sections/{sid}/videos/{vid}` | Teacher | Delete video | Pending |
 
-### Enrollments Module _(coming soon)_
+### Enrollments Module
 
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| POST | `/enrollments` | ✅ Student | Enroll in a course |
-| GET | `/enrollments/me` | ✅ Student | Get my enrolled courses |
-| DELETE | `/enrollments/{course_id}` | ✅ Student | Unenroll from course |
+| Method | Endpoint | Auth | Description | Status |
+|--------|----------|------|-------------|--------|
+| POST | `/enrollments` | Student | Enroll in a course | Pending |
+| GET | `/enrollments/me` | Student | Get my enrolled courses | Pending |
+| DELETE | `/enrollments/{course_id}` | Student | Unenroll from course | Pending |
 
-### Progress Module _(coming soon)_
+### Progress Module
 
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| POST | `/progress` | ✅ Student | Mark video as complete |
-| GET | `/progress/{course_id}` | ✅ Student | Get progress for a course |
+| Method | Endpoint | Auth | Description | Status |
+|--------|----------|------|-------------|--------|
+| POST | `/progress` | Student | Mark video as complete | Pending |
+| GET | `/progress/{course_id}` | Student | Get progress for a course | Pending |
 
 ---
 
@@ -196,6 +196,12 @@ lms-api/
 │   │   └── security.py         # hash_password, verify_password
 │   ├── users/                  # Users + Auth domain
 │   │   ├── models.py           # User + RefreshToken ORM models
+│   │   ├── schemas.py          # Pydantic request/response models
+│   │   ├── repository.py       # All DB queries
+│   │   ├── service.py          # Business logic
+│   │   └── router.py           # API routes
+│   ├── courses/                # Courses domain
+│   │   ├── models.py           # Course ORM model
 │   │   ├── schemas.py          # Pydantic request/response models
 │   │   ├── repository.py       # All DB queries
 │   │   ├── service.py          # Business logic
@@ -257,14 +263,14 @@ API docs available at: `http://localhost:8000/docs`
 
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
-| `DATABASE_URL` | ✅ | — | PostgreSQL connection string |
-| `JWT_SECRET_KEY` | ✅ | — | Secret key for signing JWTs (min 32 chars) |
-| `JWT_ALGORITHM` | ❌ | `HS256` | JWT signing algorithm |
-| `JWT_ACCESS_TOKEN_EXPIRE_MINUTES` | ❌ | `30` | Access token expiry in minutes |
-| `JWT_REFRESH_TOKEN_EXPIRE_DAYS` | ❌ | `7` | Refresh token expiry in days |
-| `APP_ENV` | ❌ | `development` | Environment (development/production) |
-| `LOG_LEVEL` | ❌ | `INFO` | Log level |
-| `LOG_FORMAT` | ❌ | `console` | Log format (console/json) |
+| `DATABASE_URL` | Yes | — | PostgreSQL connection string |
+| `JWT_SECRET_KEY` | Yes | — | Secret key for signing JWTs (min 32 chars) |
+| `JWT_ALGORITHM` | No | `HS256` | JWT signing algorithm |
+| `JWT_ACCESS_TOKEN_EXPIRE_MINUTES` | No | `30` | Access token expiry in minutes |
+| `JWT_REFRESH_TOKEN_EXPIRE_DAYS` | No | `7` | Refresh token expiry in days |
+| `APP_ENV` | No | `development` | Environment (development/production) |
+| `LOG_LEVEL` | No | `INFO` | Log level |
+| `LOG_FORMAT` | No | `console` | Log format (console/json) |
 
 ---
 
@@ -292,12 +298,27 @@ All errors return a consistent shape:
 | `USR_001` | 404 | User not found |
 | `USR_002` | 401 | User account inactive |
 | `USR_003` | 400 | Current password incorrect |
+| `CRS_001` | 404 | Course not found |
+| `CRS_002` | 400 | Course not published |
+| `CRS_003` | 403 | Not the owner of the course |
 | `GEN_001` | 500 | Internal server error |
 | `GEN_002` | 422 | Validation error |
 
 ---
 
 ## Changelog
+
+### [0.2.0] — 2026-05-29 — Courses Phase (Partial)
+
+#### Added
+- `POST /courses` — Create a new course as a teacher. Course starts as draft (is_published: false). Requires teacher role.
+- `GET /courses/me` — Get all courses belonging to the logged in teacher. Returns list with total count. Includes both draft and published courses.
+- `PUT /courses/{id}` — Update course fields (title, description, thumbnail_url, is_published). Partial update supported. Validates that the requesting teacher is the owner of the course. Used to publish a course by setting is_published to true.
+- `Course` ORM model with Alembic migration.
+- Ownership check pattern in service layer — teacher can only update or delete their own courses.
+- `CRS_001`, `CRS_002`, `CRS_003` error codes added to centralized error registry.
+
+---
 
 ### [0.1.0] — 2026-05-28 — Users Phase
 
@@ -306,8 +327,13 @@ All errors return a consistent shape:
 - `POST /users/login` — Authenticate with email and password. Returns a signed JWT access token (30 min expiry) and a refresh token (7 day expiry). Revokes all previous refresh tokens on each login.
 - `POST /users/logout` — Revoke the current refresh token. Subsequent refresh attempts with the same token return 401.
 - `POST /users/refresh` — Exchange a valid refresh token for a new access token. Refresh token is reused until logout or expiry.
-- Centralized error handling via `AppException` with consistent `error_code` + `detail` response shape
-- Centralized structured logging via `structlog` with per-request `request_id` binding
-- Centralized retry logic via `tenacity` with exponential jitter backoff for transient DB errors
-- `User` and `RefreshToken` ORM models with Alembic migration
-- `bcrypt` password hashing via `passlib` in `core/security.py`
+- `GET /users/me` — Returns current logged in user profile. Requires Bearer token. Uses get_current_user dependency to verify JWT and fetch user from DB.
+- `PUT /users/me` — Update profile fields (full_name, avatar_url). Partial update supported — only fields provided are updated.
+- `get_current_user` dependency — Extracts and validates JWT from Authorization header, fetches user from DB. Used by all protected routes.
+- `require_teacher` dependency — Wraps get_current_user, enforces teacher role. Used by all course management routes.
+- `require_student` dependency — Wraps get_current_user, enforces student role. Used by enrollment and progress routes.
+- Centralized error handling via AppException with consistent error_code + detail response shape.
+- Centralized structured logging via structlog with per-request request_id binding.
+- Centralized retry logic via tenacity with exponential jitter backoff for transient DB errors.
+- User and RefreshToken ORM models with Alembic migration.
+- bcrypt password hashing via passlib in core/security.py.

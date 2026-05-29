@@ -3,6 +3,8 @@ from src.config import get_settings
 from src.core.errors.handlers import register_exception_handlers
 from src.core.logger import RequestLoggingMiddleware, setup_logging
 from src.users.router import router as users_router
+from src.courses.router import router as courses_router
+
 
 settings=get_settings()
 
@@ -20,6 +22,7 @@ def create_app()-> FastAPI:
     register_exception_handlers(app)
     
     app.include_router(users_router, prefix="/users", tags=["users"])
+    app.include_router(courses_router, prefix="/courses", tags=["courses"])
 
     @app.get("/health", tags=["health"])
     async def health_check():
