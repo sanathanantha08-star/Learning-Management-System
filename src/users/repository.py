@@ -61,3 +61,9 @@ class UserRepository:
         for token in result.scalars().all():
             token.revoked = True
         await db.flush()
+
+    @with_retry()
+    async def update_user(self, db: AsyncSession, user: User) -> User:
+        await db.flush()
+        await db.refresh(user)
+        return user

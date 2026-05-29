@@ -6,7 +6,7 @@ from src.core.errors.exceptions import ConflictException, UnauthorizedException
 from src.core.logger import get_logger
 from src.users.models import RefreshToken, User
 from src.users.repository import UserRepository
-from src.users.schemas import LoginRequest, RegisterRequest, TokenResponse, LogoutRequest, LogoutResponse,  RefreshTokenOutRequest, RefreshTokenResponse
+from src.users.schemas import LoginRequest, RegisterRequest, TokenResponse, LogoutRequest, LogoutResponse,  RefreshTokenOutRequest, RefreshTokenResponse, UpdateUserResponse,UpdateUserRequest, UserOut
 from src.config import get_settings
 
 import hashlib
@@ -137,4 +137,15 @@ class UserService:
         logger.info("access_token_refreshed", user_id=str(user.id))
         return RefreshTokenResponse(access_token=access_token)
     
-        
+
+    async def update_user(self,db:AsyncSession,current_user:User,payload:UpdateUserRequest) -> UpdateUserResponse:
+        if payload.full_name is not None:
+            current_user.full_name = payload.full_name
+        if payload.avatar_url is not None:
+            current_user.avatar_url = payload.avatar_url
+        updated_user = await self.repo.update_user(db, current_user)
+        logger.info("profile_updated", user_id=str(updated_user.id))
+        return UpdateUserResponse(
+            message="User updated successfully.",
+            user=UserOut.model_validate(updated_user),
+        )

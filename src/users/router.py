@@ -3,7 +3,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.database import get_db
 
 
-from src.users.schemas import LoginRequest, LogoutRequest, RegisterResponse,RegisterRequest, TokenResponse,UserOut,LogoutResponse,RefreshTokenOutRequest, RefreshTokenResponse
+from src.users.dependencies import get_current_user
+from src.users.models import User
+from src.users.schemas import LoginRequest, LogoutRequest, RegisterResponse,RegisterRequest, TokenResponse, UpdateUserRequest, UpdateUserResponse,UserOut,LogoutResponse,RefreshTokenOutRequest, RefreshTokenResponse
 from src.users.service import UserService
 
 router=APIRouter()
@@ -50,3 +52,21 @@ async def logout(payload: LogoutRequest, db: AsyncSession = Depends(get_db)) -> 
 
 async def refresh(payload: RefreshTokenOutRequest, db: AsyncSession = Depends(get_db)) -> RefreshTokenResponse:
     return await user_service.refresh_access_token(db,payload)
+
+@router.get(
+    "/me",
+    response_model=UserOut,
+    status_code=status.HTTP_200_OK,
+)
+async def get_me(current_user:User=Depends(get_current_user)) -> UserOut:
+    return UserOut.model_validate(current_user)
+
+
+@router.put(
+    "/me",
+    response_model=UpdateUserResponse,
+    status_code=status.HTTP_200_OK,
+)
+
+async def update_user(payload:UpdateUserRequest,current_user:User=Depends(get_current_user),db:AsyncSession=Depends(get_db)) -> UpdateUserResponse:
+    return await user_service.update_user(db, current_user, payload)

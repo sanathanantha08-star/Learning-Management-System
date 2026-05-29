@@ -71,4 +71,12 @@ class RefreshTokenOutRequest(BaseModel):
 class RefreshTokenResponse(BaseModel):
         access_token: str
         token_type: str = "bearer"
-        
+
+
+class UpdateUserRequest(BaseModel):
+    full_name: str | None = None
+    avatar_url: str | None = None
+
+class UpdateUserResponse(BaseModel):
+    message: str
+    user: UserOut
