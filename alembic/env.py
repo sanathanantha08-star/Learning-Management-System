@@ -4,6 +4,7 @@ from logging.config import fileConfig
 from alembic import context
 from sqlalchemy.ext.asyncio import create_async_engine
 from src.courses.models import Course
+from src.sections.models import Section  
 from src.config import get_settings
 from src.database import Base
 from src.users.models import User, RefreshToken  # noqa: F401

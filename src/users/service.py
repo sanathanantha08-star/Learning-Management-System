@@ -149,3 +149,5 @@ class UserService:
             message="User updated successfully.",
             user=UserOut.model_validate(updated_user),
         )
+    
+    

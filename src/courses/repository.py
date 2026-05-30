@@ -36,4 +36,23 @@ class CourseRepository:
         await db.refresh(course)
         return course
     
+    @with_retry()
+    async def delete(self, db: AsyncSession, course: Course) -> None:
+        await db.delete(course)
+        await db.flush()
+        
+    @with_retry()
+    async def get_all_published(self, db: AsyncSession) -> list[Course]:
+        result = await db.execute(
+        select(Course)
+        .where(Course.is_published == True)
+        .order_by(Course.created_at.desc())
+    )
+        return list(result.scalars().all())
     
+    @with_retry()
+    async def get_course_details(self, db: AsyncSession, course_id: uuid.UUID) -> Course | None:
+        result = await db.execute(select(Course).where(Course.id == course_id))
+        return result.scalar_one_or_none()
+
+ 

@@ -1,10 +1,11 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src import courses
 from src.core.errors.codes import ErrorCode
-from src.core.errors.exceptions import NotFoundException
+from src.core.errors.exceptions import ForbiddenException, NotFoundException
 from src.courses.models import Course
 from src.courses.repository import CourseRepository
-from src.courses.schemas import CourseUpdateRequest,CourseUpdateResponse, CreateCourseRequest, CreateCourseResponse, CourseOut, TeacherCoursesResponse
+from src.courses.schemas import AllCoursesResponse, CourseUpdateRequest,CourseUpdateResponse, CreateCourseRequest, CreateCourseResponse, CourseOut, DeleteCourseResponse, TeacherCoursesResponse
 from src.users.models import User
 from src.core.logger import get_logger
 import uuid
@@ -64,3 +65,37 @@ class CourseService:
             message="Course updated successfully.",
             course=CourseOut.model_validate(updated),
         )
+    
+    async def delete_course(self, db: AsyncSession, teacher: User, course_id: uuid.UUID) -> DeleteCourseResponse:
+        course = await self.repo.get_by_id(db, course_id)
+        if not course:
+            raise NotFoundException(
+            code=ErrorCode.CRS_NOT_FOUND,
+            detail="Course not found.",
+        )
+
+        if course.teacher_id != teacher.id:
+            raise ForbiddenException(
+            code=ErrorCode.CRS_NOT_OWNER,
+            detail="You are not the owner of this course.",
+        )
+
+        await self.repo.delete(db, course)
+        logger.info("course_deleted", course_id=str(course.id), teacher_id=str(teacher.id))
+        return DeleteCourseResponse(message="Course deleted successfully.")
+    
+    async def get_all_courses(self, db: AsyncSession) -> AllCoursesResponse:
+        courses = await self.repo.get_all_published(db)
+        return AllCoursesResponse(
+        courses=[CourseOut.model_validate(c) for c in courses],
+        total=len(courses),
+    )
+
+    async def get_course_details(self, db: AsyncSession, course_id: uuid.UUID) -> CourseOut:
+        course = await self.repo.get_course_details(db, course_id)
+        if not course or not course.is_published:
+            raise NotFoundException(
+                code=ErrorCode.CRS_NOT_FOUND,
+                detail="Course not found.",
+            )
+        return CourseOut.model_validate(course)

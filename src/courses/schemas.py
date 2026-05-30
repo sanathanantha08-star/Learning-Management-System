@@ -37,3 +37,12 @@ class CourseUpdateRequest(BaseModel):
 class CourseUpdateResponse(BaseModel):  
     message: str
     course: CourseOut
+
+
+
+class DeleteCourseResponse(BaseModel):
+    message: str
+
+class AllCoursesResponse(BaseModel):
+    courses: list[CourseOut]
+    total: int

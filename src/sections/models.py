@@ -1,27 +1,25 @@
 import uuid
 from datetime import datetime, timezone
 
-from sqlalchemy import Boolean, DateTime, ForeignKey, String, Text
+from sqlalchemy import DateTime, ForeignKey, Integer, String
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.database import Base
 
 
-class Course(Base):
-    __tablename__ = "courses"
+class Section(Base):
+    __tablename__ = "sections"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    teacher_id: Mapped[uuid.UUID] = mapped_column(
+    course_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
-        ForeignKey("users.id", ondelete="CASCADE"),
+        ForeignKey("courses.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
     title: Mapped[str] = mapped_column(String(255), nullable=False)
-    description: Mapped[str | None] = mapped_column(Text, nullable=True)
-    thumbnail_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
-    is_published: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    order_index: Mapped[int] = mapped_column(Integer, nullable=False)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
@@ -34,8 +32,7 @@ class Course(Base):
         nullable=False,
     )
 
-    teacher = relationship("User", lazy="noload")
-    sections = relationship("Section", lazy="noload", cascade="all, delete-orphan")
+    course = relationship("Course", lazy="noload")
 
     def __repr__(self) -> str:
-        return f"<Course id={self.id} title={self.title} published={self.is_published}>"
+        return f"<Section id={self.id} title={self.title} order={self.order_index}>"
