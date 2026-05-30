@@ -116,18 +116,18 @@ Authorization: Bearer <access_token>
 
 | Method | Endpoint | Auth | Description | Status |
 |--------|----------|------|-------------|--------|
-| GET | `/courses` | No | List and search published courses | Pending |
-| GET | `/courses/{id}` | No | Get course detail with sections | Pending |
+| GET | `/courses` | Yes | List and search published courses | Done |
+| GET | `/courses/{id}` | Yes | Get course detail with sections | Partial |
 | POST | `/courses` | Teacher | Create a new course | Done |
 | PUT | `/courses/{id}` | Teacher | Update course (including publish) | Done |
-| DELETE | `/courses/{id}` | Teacher | Delete course | Pending |
+| DELETE | `/courses/{id}` | Teacher | Delete course | Done |
 | GET | `/courses/me` | Teacher | Get teacher's own courses | Done |
 
 ### Sections Module
 
 | Method | Endpoint | Auth | Description | Status |
 |--------|----------|------|-------------|--------|
-| POST | `/courses/{id}/sections` | Teacher | Add section to course | Pending |
+| POST | `/courses/{id}/sections` | Teacher | Add section to course | Done |
 | PUT | `/courses/{id}/sections/{sid}` | Teacher | Update section | Pending |
 | DELETE | `/courses/{id}/sections/{sid}` | Teacher | Delete section | Pending |
 
@@ -202,6 +202,12 @@ lms-api/
 │   │   └── router.py           # API routes
 │   ├── courses/                # Courses domain
 │   │   ├── models.py           # Course ORM model
+│   │   ├── schemas.py          # Pydantic request/response models
+│   │   ├── repository.py       # All DB queries
+│   │   ├── service.py          # Business logic
+│   │   └── router.py           # API routes
+│   ├── sections/               # Sections domain
+│   │   ├── models.py           # Section ORM model
 │   │   ├── schemas.py          # Pydantic request/response models
 │   │   ├── repository.py       # All DB queries
 │   │   ├── service.py          # Business logic
@@ -307,6 +313,18 @@ All errors return a consistent shape:
 ---
 
 ## Changelog
+
+### [0.3.0] — 2026-05-30 — Courses Phase (Complete) + Sections Phase (Partial)
+
+#### Added
+- `GET /courses` — List and search all published courses. Requires auth token. Returns paginated list of published courses.
+- `GET /courses/{id}` — Get course detail by ID. Requires auth token. Currently returns course fields only. Will be updated to include nested sections and videos once the sections and videos modules are complete. Returns `CRS_001` if course not found.
+- `DELETE /courses/{id}` — Delete a course. Requires teacher role. Validates ownership before deletion. Returns `CRS_001` if not found, `CRS_003` if not the owner.
+- `POST /courses/{id}/sections` — Add a section to a course. Requires teacher role. Validates that the course exists and that the requesting teacher is the owner. Accepts `title` and `order_index`. Returns `CRS_001` if course not found, `CRS_003` if not the owner.
+- `Section` ORM model with Alembic migration.
+- `sections/` module scaffolded with models, schemas, repository, service, and router following the same layered pattern as the courses module.
+
+---
 
 ### [0.2.0] — 2026-05-29 — Courses Phase (Partial)
 
